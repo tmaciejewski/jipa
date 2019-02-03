@@ -1,0 +1,176 @@
+<html>
+    <head>
+        <title>InfoPasażer Archiver - archiwum opóźnień pociągów</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/style.css" type="text/css" />
+        <link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet"/>
+        <link rel="shortcut icon" href="/img/favicon.png" type="image/png" />
+    </head>
+    <body>
+        <div id="page"><img src="img/loader.gif" alt="Wczytywanie"></div>
+
+        <hr>
+        <div id="footer">
+            <p>
+                <a href="https://github.com/tmaciejewski/ipa">source on GitHub</a>
+            </p>
+        </div>
+
+        <script type="text/template" id="main-template">
+            <h1>InfoPasażer Archiver</h1>
+            <h5>
+                Poprzednie lata:
+                <a href="ipa_15_16.tar.bz2">2015/2016</a> | <a href="ipa_16_17.7z">2016/2017</a> | <a href="ipa_17_18.7z">2017/2018</a>
+                <span class="tooltip" title="Zalecana przeglądarka Firefox. Google Chrome wymaga uruchomienia z opcją '--allow-file-access-from-files'">[?]</span>
+            </h5>
+
+            <label for="filter">Filtruj pociąg/stację:</label><input id="filter">
+
+            <div id="main-content"></div>
+        </script>
+
+        <script type="text/template" id="main-table-template">
+            <% if (state == 'waiting') { %>
+                <div class="message">
+                    <img src="img/loader.gif" alt="Wczytywanie">
+                </div>
+            <% } else if (state == 'error') { %>
+                <div class="message">
+                    Wystąpił błąd
+                </div>
+            <% } else if (size == 0) { %>
+                <div class="message">
+                    Nie znaleziono pociągów
+                </div>
+            <% } else { %>
+                <table id="menu">
+                    <tr>
+                        <td class="arrow-button">
+                            <% if (page > 1) { %>
+                                <button class="prev-page">Poprzednia strona</button>
+                            <% } %>
+                        </td>
+                        <td>
+                            <p>Strona <%- page %> z <%- pageCount %></p>
+                        </td>
+                        <td class="arrow-button">
+                            <% if (page < pageCount) { %>
+                                <button class="next-page">Następna strona</button>
+                            <% } %>
+                        </td>
+                    </tr>
+                </table>
+
+                <table id="main-table">
+                    <tr><th>Numer pociągu</th><th>Skąd</th><th>Przez</th><th>Dokąd</th></tr>
+                 </table>
+            <% } %>
+        </script>
+
+        <script type="text/template" id="main-item-template">
+            <td><a href="#train/<%- train_name %>"><%- train_name %></a></td>
+            <td><%- stations[0] %></td>
+            <td>
+                <table>
+                    <tr>
+                        <td class="arrow-button">
+                            <% if (activeStation > firstIntermediateStation) { %>
+                                <button class="prev-station">&#8592;</button>
+                            <% } %>
+                        </td>
+                        <td class="intermediate-station"> <%- stations[activeStation] %> </td>
+                        <td class="arrow-button">
+                            <% if (activeStation < lastIntermediateStation) { %>
+                                <button class="next-station">&#8594;</button>
+                            <% } %>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td><%- stations[stations.length - 1] %></td>
+        </script>
+
+        <script type="text/template" id="train-template">
+            <h1><div><a href="#">&lt;&lt;</a></div> <%- train_name %></h1>
+            <table>
+                <%
+                    var getDelayClass = function(info) {
+                       var delay = Math.max(info.arrival_delay, info.departure_delay);
+
+                       if (delay >= 60)
+                           return 'critical';
+                       else if (delay >= 20)
+                           return 'moderate';
+                       else if (delay >= 5)
+                           return 'minor';
+                       else
+                           return 'normal';
+                    };
+
+                    var formatDate = function(date) {
+                        var d = new Date(date);
+                        if (d.getHours() < 10) {
+                            var h = '0' + d.getHours();
+                        } else {
+                            var h = d.getHours();
+                        }
+
+                        if (d.getMinutes() < 10) {
+                            var m = '0' + d.getMinutes();
+                        } else {
+                            var m = d.getMinutes();
+                        }
+
+                        return h + ':' + m;
+                    };
+                %>
+                <% _.each(schedules, function(schedule) { %>
+                    <tr>
+                        <%
+                            var i = 0;
+                            var date_freq = 10;
+                            _.each(schedule.info, function(info) {
+                                if (i % date_freq == 0) {
+                                    %> <th rowspan=2 class="date"><%- schedule.schedule_date  %></th> <%
+                                }
+                                %> <th><%- info.station_name %></th> <%
+                                i += 1;
+                            });
+                        %>
+                    </tr>
+                    <tr>
+                        <% _.each(schedule.info, function(info) { %>
+                            <td class="<%= getDelayClass(info) %>">
+                                <table>
+                                <% if (info.arrival_time) { %>
+                                    <tr><td>&#8594;</td><td class="time">
+                                        <%= formatDate(info.arrival_time) %>
+                                        (<%- info.arrival_delay %> min)
+                                        </td><td></td></tr>
+                                <% } %>
+
+                                <% if (info.departure_time) { %>
+                                    <tr><td></td><td class="time">
+                                        <%= formatDate(info.departure_time) %>
+                                        (<%- info.departure_delay %> min)
+                                        </td><td>&#8594;</td></tr>
+                                <% } %>
+                                </table>
+                            </td>
+                        <% }); %>
+                    </tr>
+                <% }); %>
+            </table>
+        </script>
+
+        <script type="text/template" id="error-template">
+            <h1><div><a href="#">&lt;&lt;</a></div><%- msg %></h1>
+        </script>
+
+        <script src="js/jquery.min.js" type="text/javascript"></script>
+        <script src="js/underscore-min.js" type="text/javascript"></script>
+        <script src="js/backbone-min.js" type="text/javascript"></script>
+        <script src="js/ipa.js" type="text/javascript"></script>
+    </body>
+</html>
