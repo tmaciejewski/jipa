@@ -3,13 +3,19 @@ package japi;
 import java.util.*;
 import java.time.*;
 
+import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 public class TrainsDAO {
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     public List<Train> getAllTrains() {
         List<String> stations = Arrays.asList("Kalisz", "Ostrów Wielkopolski", "Poznań");
         return Arrays.asList(new Train("ciopong", stations),

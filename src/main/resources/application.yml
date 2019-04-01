@@ -1,2 +1,5 @@
-ipa:
-    url: ipa.lovethosetrains.com/api
+spring:
+    h2:
+        console:
+            enabled: true
+            path: /h2
