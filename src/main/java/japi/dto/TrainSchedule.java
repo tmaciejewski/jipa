@@ -3,9 +3,9 @@ package japi;
 import java.util.List;
 import java.time.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Value;
+import lombok.Data;
 
-@Value
+@Data
 public class TrainSchedule {
     @JsonProperty("schedule_id")
     int id;
@@ -14,7 +14,7 @@ public class TrainSchedule {
     LocalDate date;
     List<Info> info;
 
-    @Value
+    @Data
     public static class Info {
         @JsonProperty("station_name")
         String stationName;

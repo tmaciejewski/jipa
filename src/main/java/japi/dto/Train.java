@@ -1,10 +1,10 @@
 package japi;
 
-import lombok.Value;
+import lombok.Data;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Value
+@Data
 public class Train {
     @JsonProperty("train_name")
     String name;

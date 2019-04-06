@@ -38,10 +38,16 @@ public class TrainControllerTest {
     public void test_getAllTrains() throws Exception {
         List<String> stations1 = Arrays.asList("Kalisz", "Ostrów Wielkopolski", "Poznań");
         List<String> stations2 = Arrays.asList("Gdynia", "Sopot");
-        List<Train> trains = Arrays.asList(new Train("ciopong", stations1),
-                                           new Train("ciufka", stations2));
 
-        Mockito.when(trainsDAO.getAllTrains()).thenReturn(trains);
+        Train train1 = new Train();
+        train1.setName("ciopong");
+        train1.setStations(stations1);
+
+        Train train2 = new Train();
+        train2.setName("ciufka");
+        train2.setStations(stations2);
+
+        Mockito.when(trainsDAO.getAllTrains()).thenReturn(Arrays.asList(train1, train2));
 
         mvc.perform(get("/api/trains")
                 .contentType(APPLICATION_JSON))
@@ -55,13 +61,33 @@ public class TrainControllerTest {
 
     @Test
     public void test_getTrainSchedules() throws Exception {
-        List<TrainSchedule.Info> info = Arrays.asList(
-                new TrainSchedule.Info("Kalisz", 1, LocalDateTime.of(2017, 10, 5, 15, 0), 3, LocalDateTime.of(2017, 10, 5, 15, 10)),
-                new TrainSchedule.Info("Ostrów Wielkopolski", 4, LocalDateTime.of(2017, 10, 5, 16, 30), 13, LocalDateTime.of(2017, 10, 5, 16, 40)),
-                new TrainSchedule.Info("Poznań", 100, LocalDateTime.of(2017, 10, 5, 17, 8), 3, LocalDateTime.of(2017, 10, 5, 17, 10)));
-        List<TrainSchedule> schedules = Arrays.asList(new TrainSchedule(123, LocalDate.of(2017, 1, 1), info));
+        TrainSchedule.Info info1 = new TrainSchedule.Info();
+        info1.setStationName("Kalisz");
+        info1.setArrivalDelay(1);
+        info1.setArrivalTime(LocalDateTime.of(2017, 10, 5, 15, 0));
+        info1.setDepartureDelay(3);
+        info1.setDepartureTime(LocalDateTime.of(2017, 10, 5, 15, 10));
 
-        Mockito.when(trainsDAO.getTrainSchedules("train name")).thenReturn(schedules);
+        TrainSchedule.Info info2 = new TrainSchedule.Info();
+        info2.setStationName("Ostrów Wielkopolski");
+        info2.setArrivalDelay(4);
+        info2.setArrivalTime(LocalDateTime.of(2017, 10, 5, 16, 30));
+        info2.setDepartureDelay(13);
+        info2.setDepartureTime(LocalDateTime.of(2017, 10, 5, 16, 40));
+
+        TrainSchedule.Info info3 = new TrainSchedule.Info();
+        info3.setStationName("Poznań");
+        info3.setArrivalDelay(100);
+        info3.setArrivalTime(LocalDateTime.of(2017, 10, 5, 17, 8));
+        info3.setDepartureDelay(3);
+        info3.setDepartureTime(LocalDateTime.of(2017, 10, 5, 17, 10));
+
+        TrainSchedule schedule = new TrainSchedule();
+        schedule.setId(123);
+        schedule.setDate(LocalDate.of(2017, 1, 1));
+        schedule.setInfo(Arrays.asList(info1, info2, info3));
+
+        Mockito.when(trainsDAO.getTrainSchedules("train name")).thenReturn(Arrays.asList(schedule));
 
         mvc.perform(get("/api/trains/train name")
                 .contentType(APPLICATION_JSON))
@@ -89,9 +115,12 @@ public class TrainControllerTest {
 
     @Test
     public void test_getTrainNameWithSlash() throws Exception {
-        List<TrainSchedule> schedules = Arrays.asList(new TrainSchedule(123, LocalDate.of(2017, 1, 1), Collections.emptyList()));
+        TrainSchedule schedule = new TrainSchedule();
+        schedule.setId(123);
+        schedule.setDate(LocalDate.of(2017, 1, 1));
+        schedule.setInfo(Collections.emptyList());
 
-        Mockito.when(trainsDAO.getTrainSchedules("train/name")).thenReturn(schedules);
+        Mockito.when(trainsDAO.getTrainSchedules("train/name")).thenReturn(Arrays.asList(schedule));
 
         mvc.perform(get("/api/trains/train/name")
                 .contentType(APPLICATION_JSON))
