@@ -1,0 +1,105 @@
+body {
+    text-align: center;
+    font-family: 'PT Sans';
+    overflow-y: scroll;
+}
+
+h1 div {
+    position: absolute;
+    left: 10px;
+}
+
+h5 {
+    font-size: small;
+    margin-top: -10px;
+}
+
+#menu {
+    margin-left: auto;
+    margin-right: auto;
+    table-layout: fixed;
+    height: 40px;
+}
+
+#menu td {
+    min-width: 300px;
+}
+
+#main-content {
+    margin-top: 20px;
+}
+
+table {
+    text-align: center;
+    font-size: 14px;
+    margin: auto;
+}
+
+#main-table > tbody > td, th {
+    padding: 5px;
+    min-width: 200px;
+}
+
+#main-table {
+    line-height: 2em;
+}
+
+#main-table > tbody > tr:nth-child(even) {
+    background-color: #9e9;
+}
+
+#main-table > tbody > tr:nth-child(odd) {
+    background-color: #6c6;
+}
+
+.intermediate-station {
+    width: 200px;
+}
+
+.arrow-button {
+    min-width: 50px;
+}
+
+th {
+    background-color: #0076c8;
+    color: #fff;
+    font-weight: normal;
+}
+
+th:empty {
+    background-color: #fff;
+}
+
+.normal {
+    background-color: #96fe9e;
+}
+
+.minor {
+    background-color: #fffd52;
+}
+
+.moderate {
+    background-color: #ffb452;
+}
+
+.critical {
+    background-color: red;
+}
+
+#footer {
+    font-size: small;
+    text-align: left;
+}
+
+.date {
+    font-size: 20px;
+}
+
+hr {
+    margin-top: 20px;
+    margin-bottom: -10px;
+}
+
+label {
+    margin: 1ex;
+}
